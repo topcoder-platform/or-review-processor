@@ -1,0 +1,48 @@
+{
+  "name": "or-review-processor",
+  "version": "1.0.0",
+  "description": "Topcoder Online Review Processor",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "test": "nyc --reporter=html --reporter=text mocha test/unit/test.js --timeout 20000 --exit",
+    "e2e": "nyc --reporter=html --reporter=text mocha test/e2e/test.js --timeout 20000 --exit"
+  },
+  "author": "TCSCODER",
+  "license": "none",
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "nyc": "^13.3.0",
+    "should": "^13.2.3",
+    "standard": "^11.0.1"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "config": "^3.0.1",
+    "get-parameter-names": "^0.3.0",
+    "joi": "^14.3.1",
+    "lodash": "^4.17.11",
+    "no-kafka": "^3.4.3",
+    "superagent": "^4.1.0",
+    "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.6",
+    "topcoder-healthcheck-dropin": "^1.0.2",
+    "winston": "^3.2.1"
+  },
+  "engines": {
+    "node": "10.x"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ]
+  },
+  "nyc": {
+    "exclude": [
+      "test/common/*.js",
+      "test/unit/test.js",
+      "test/e2e/test.js"
+    ]
+  }
+}
