@@ -1,4 +1,4 @@
-# Topcoder - OR Review Processor
+# Topcoder - Scorecard Processor
 
 ## Verification
 

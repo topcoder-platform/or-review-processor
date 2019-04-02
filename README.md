@@ -1,4 +1,4 @@
-# Topcoder - OR Review Processor
+# Topcoder - Scorecard Processor
 
 ## Dependencies
 
@@ -7,7 +7,7 @@
 
 ## Configuration
 
-Configuration for the OR review processor is at `config/default.js`.
+Configuration for the Scorecard processor is at `config/default.js`.
 The following parameters can be set in config files or in env variables:
 - LOG_LEVEL: the log level; default value: 'debug'
 - KAFKA_URL: comma separated Kafka hosts; default value: 'localhost:9092'
@@ -18,7 +18,7 @@ The following parameters can be set in config files or in env variables:
     if not provided, then SSL connection is not used, direct insecure connection is used;
     if provided, it can be either path to private key file or private key content
 - KAFKA_GROUP_ID: consumer group id; default value: 'or-review-processor'
-- OR_REVIEW_TOPIC : OR review processor topic, default value is 'or.notification.create'
+- OR_REVIEW_TOPIC : Scorecard processor topic, default value is 'or.notification.create'
 - REVIEW_API_URL: review api url, default is 'https://api.topcoder-dev.com/v5/reviews'
 - SUBMISSION_API_URL: submission api url, default is 'https://api.topcoder-dev.com/v5/submissions'
 - REVIEW_TYPE_API_URL: review type api url, default is 'https://api.topcoder-dev.com/v5/reviewTypes'

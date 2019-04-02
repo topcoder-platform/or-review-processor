@@ -1,5 +1,5 @@
 /**
- * E2E test of the OR Review Processor.
+ * E2E test of the Scorecard Processor.
  */
 process.env.NODE_ENV = 'test'
 
@@ -16,7 +16,7 @@ const logger = require('../../src/common/logger')
 const testHelper = require('../common/testHelper')
 const { testTopics } = require('../common/testData')
 
-describe('Topcoder - OR Review Processor E2E Test', () => {
+describe('Topcoder - Scorecard Processor E2E Test', () => {
   let app
   let m2mToken
   let infoLogs = []

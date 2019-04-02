@@ -12,7 +12,7 @@ module.exports = {
   KAFKA_CLIENT_CERT_KEY: process.env.KAFKA_CLIENT_CERT_KEY,
 
   // Kafka group id
-  KAFKA_GROUP_ID: process.env.KAFKA_GROUP_ID || 'or-review-processor',
+  KAFKA_GROUP_ID: process.env.KAFKA_GROUP_ID || 'scorecard-processor',
 
   // Kafka topics related to Creation and Update of review entity
   OR_REVIEW_TOPIC: process.env.OR_REVIEW_TOPIC || 'or.notification.create',

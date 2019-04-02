@@ -1,5 +1,5 @@
 /**
- * Mocha tests of the OR review Processor.
+ * Mocha tests of the Scorecard Processor.
  */
 process.env.NODE_ENV = 'test'
 
@@ -12,7 +12,7 @@ const ProcessorService = require('../../src/services/ProcessorService')
 const testHelper = require('../common/testHelper')
 const { testTopics } = require('../common/testData')
 
-describe('Topcoder - OR Review Processor Unit Test', () => {
+describe('Topcoder - Scorecard Processor Unit Test', () => {
   let infoLogs = []
   let errorLogs = []
   let debugLogs = []
