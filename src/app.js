@@ -8,7 +8,8 @@ const Kafka = require('no-kafka')
 const healthcheck = require('topcoder-healthcheck-dropin')
 const logger = require('./common/logger')
 const helper = require('./common/helper')
-const ProcessorService = require('./services/ProcessorService')
+const ReviewProcessorService = require('./services/ReviewProcessorService')
+const SubmissionProcessorService = require('./services/SubmissionProcessorService')
 
 // Start kafka consumer
 logger.info('Starting kafka consumer')
@@ -40,16 +41,17 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
   }
 
   return (async () => {
-    if (topic === config.OR_REVIEW_TOPIC) {
-      await ProcessorService.process(messageJSON)
+    if (topic === config.REVIEW_TOPIC) {
+      await ReviewProcessorService.processReview(messageJSON)
+    } else if (topic === config.CREATE_SUBMISSION_TOPIC || topic === config.UPDATE_SUBMISSION_TOPIC) {
+      await SubmissionProcessorService.processSubmission(messageJSON)
     } else {
       throw new Error(`Invalid topic: ${topic}`)
     }
-    logger.debug('Successfully processed message')
   })()
-  // commit offset regardless of errors
-    .then(() => {})
+    .then(() => { logger.debug('Successfully processed message') })
     .catch((err) => { logger.logFullError(err) })
+    // commit offset regardless of errors
     .finally(() => consumer.commitOffset({ topic, partition, offset: m.offset }))
 })
 
@@ -66,7 +68,7 @@ function check () {
   return connected
 }
 
-const topics = [config.OR_REVIEW_TOPIC]
+const topics = [config.REVIEW_TOPIC, config.CREATE_SUBMISSION_TOPIC, config.UPDATE_SUBMISSION_TOPIC]
 
 consumer
   .init([{

@@ -1,5 +1,5 @@
 /**
- * Processor Service
+ * Review Processor Service
  */
 
 const _ = require('lodash')
@@ -12,7 +12,7 @@ const helper = require('../common/helper')
  * Process create and update review message
  * @param {Object} message the kafka message
  */
-async function process (message) {
+async function processReview (message) {
   const eventType = _.get(message, 'payload.eventType')
   if (eventType === 'CREATE' || eventType === 'UPDATE') {
     const m2mToken = await helper.getM2Mtoken()
@@ -56,11 +56,22 @@ async function process (message) {
           scoreCardId: payload.scorecardId
         },
         m2mToken)
-      const [review] = res.body
+      const reviews = res.body || []
+      // find latest review
+      let review
+      if (reviews.length > 0) {
+        review = reviews[0]
+      }
+      for (let i = 1; i < reviews.length; i += 1) {
+        if (new Date(reviews[i].created) > new Date(review.created)) {
+          review = reviews[i]
+        }
+      }
       if (_.isUndefined(review)) {
         throw new Error(`Review doesn't exist under criteria ${_.pick(payload, ['submissionId', 'reviewerId', 'scorecardId'])}`)
       }
 
+      // update review
       await helper.putRequest(`${config.REVIEW_API_URL}/${review.id}`, body, m2mToken)
     }
   } else {
@@ -68,7 +79,7 @@ async function process (message) {
   }
 }
 
-process.schema = {
+processReview.schema = {
   message: joi.object().keys({
     topic: joi.string().required(),
     originator: joi.string().required(),
@@ -92,7 +103,7 @@ process.schema = {
 }
 
 module.exports = {
-  process
+  processReview
 }
 
 logger.buildService(module.exports)

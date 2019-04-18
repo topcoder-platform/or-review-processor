@@ -17,11 +17,15 @@ The following parameters can be set in config files or in env variables:
 - KAFKA_CLIENT_CERT_KEY: Kafka connection private key, optional; default value is undefined;
     if not provided, then SSL connection is not used, direct insecure connection is used;
     if provided, it can be either path to private key file or private key content
-- KAFKA_GROUP_ID: consumer group id; default value: 'or-review-processor'
-- OR_REVIEW_TOPIC : Scorecard processor topic, default value is 'or.notification.create'
+- KAFKA_GROUP_ID: consumer group id; default value: 'scorecard-processor'
+- REVIEW_TOPIC : Review topic, default value is 'submission.notification.score'
+- CREATE_SUBMISSION_TOPIC : create submission topic, default value is 'submission.notification.create'
+- UPDATE_SUBMISSION_TOPIC : update submission topic, default value is 'submission.notification.update'
 - REVIEW_API_URL: review api url, default is 'https://api.topcoder-dev.com/v5/reviews'
 - SUBMISSION_API_URL: submission api url, default is 'https://api.topcoder-dev.com/v5/submissions'
 - REVIEW_TYPE_API_URL: review type api url, default is 'https://api.topcoder-dev.com/v5/reviewTypes'
+- CHALLENGE_API_URL: challenge API URL, default is 'https://api.topcoder-dev.com/v4/challenges'
+- SCORECARD_API_URL: scorecard API URL, default is 'http://localhost:4000/scorecards'
 - AUTH0_URL: Auth0 URL, used to get TC M2M token
 - AUTH0_AUDIENCE: Auth0 audience, used to get TC M2M token
 - TOKEN_CACHE_TIME: Auth0 token cache time, used to get TC M2M token
@@ -33,7 +37,7 @@ The following parameters can be set in config files or in env variables:
 Also note that there is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
 Configuration for the tests is at `config/test.js`, only add such new configurations different from `config/default.js`
-- WAIT_TIME: wait time used in test, default is 1000 or one second
+- WAIT_TIME: wait time used in test, default is 2000 or 2 seconds
 - REVIEW_SUMMATION_API_URL: review summation api url, used to clear resource during testing, default is 'https://api.topcoder-dev.com/v5/reviewSummations'
 
 ## Local Kafka setup
@@ -49,16 +53,20 @@ Configuration for the tests is at `config/test.js`, only add such new configurat
   `bin/kafka-server-start.sh config/server.properties`
 - note that the zookeeper server is at localhost:2181, and Kafka server is at localhost:9092
 - use another terminal, go to same directory, create the needed topics:
-  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic or.notification.create`
+  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic submission.notification.score`
+  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic submission.notification.create`
+  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic submission.notification.update`
+  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic avscan.action.scan`
+  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic or.action.review`
 - verify that the topics are created:
   `bin/kafka-topics.sh --list --zookeeper localhost:2181`,
   it should list out the created topics
-- run the producer and then write some message into the console to send to the `or.notification.create` topic:
-  `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic or.notification.create`
+- run the producer and then write some message into the console to send to the `submission.notification.score` topic:
+  `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic submission.notification.score`
   in the console, write message, one message per line:
-  `{ "topic": "or.notification.create", "originator": "or-app", "timestamp": "2019-02-25T00:00:00", "mime-type": "application/json", "payload": { "score": 90, "submissionId": 206743, "reviewId": 390087, "scorecardId": 300001610, "reviewerId": 151743, "reviewTypeId": 2, "eventType": "CREATE" } }`
+  `{ "topic": "submission.notification.score", "originator": "or-app", "timestamp": "2019-02-25T00:00:00", "mime-type": "application/json", "payload": { "score": 85, "submissionId": 206744, "reviewId": 390088, "scorecardId": 300001610, "reviewerId": 151743, "reviewTypeId": 2, "eventType": "CREATE" } }`
 - optionally, use another terminal, go to same directory, start a consumer to view the messages:
-  `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic or.notification.create --from-beginning`
+  `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic submission.notification.score --from-beginning`
 - writing/reading messages to/from other topics are similar
 
 ## Local deployment
@@ -84,3 +92,12 @@ npm start
 
 ## Verification
 Refer to the verification document `Verification.md`
+
+
+## Notes
+- the retrieved M2M token has no permission to delete review summation,
+  but clearing review summation is not necessary, so we may ignore such forbidden error
+- usually, we should use TC bus API (POST /v5/bus/events) to send new messages for SubmissionProcessorService.processSubmission,
+  but recently some TC dev API is not available, and the bus API fails with `504 temporarily unavailable error` when
+  posting to topic `or.action.review`, so instead, this processor uses a Kafka producer to send new messages
+
