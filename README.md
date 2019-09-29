@@ -21,11 +21,10 @@ The following parameters can be set in config files or in env variables:
 - REVIEW_TOPIC : Review topic, default value is 'submission.notification.score'
 - CREATE_SUBMISSION_TOPIC : create submission topic, default value is 'submission.notification.create'
 - UPDATE_SUBMISSION_TOPIC : update submission topic, default value is 'submission.notification.update'
-- REVIEW_API_URL: review api url, default is 'https://api.topcoder-dev.com/v5/reviews'
-- SUBMISSION_API_URL: submission api url, default is 'https://api.topcoder-dev.com/v5/submissions'
-- REVIEW_TYPE_API_URL: review type api url, default is 'https://api.topcoder-dev.com/v5/reviewTypes'
+- SUBMISSION_API_URL: submission api url, default is 'https://api.topcoder-dev.com/v5'
 - CHALLENGE_API_URL: challenge API URL, default is 'https://api.topcoder-dev.com/v4/challenges'
 - SCORECARD_API_URL: scorecard API URL, default is 'http://localhost:4000/scorecards'
+- BUS_API_URL: bus API URL, default is 'https://api.topcoder-dev.com/v5/bus/events'
 - AUTH0_URL: Auth0 URL, used to get TC M2M token
 - AUTH0_AUDIENCE: Auth0 audience, used to get TC M2M token
 - TOKEN_CACHE_TIME: Auth0 token cache time, used to get TC M2M token
@@ -38,7 +37,6 @@ Also note that there is a `/health` endpoint that checks for the health of the a
 
 Configuration for the tests is at `config/test.js`, only add such new configurations different from `config/default.js`
 - WAIT_TIME: wait time used in test, default is 2000 or 2 seconds
-- REVIEW_SUMMATION_API_URL: review summation api url, used to clear resource during testing, default is 'https://api.topcoder-dev.com/v5/reviewSummations'
 
 ## Local Kafka setup
 

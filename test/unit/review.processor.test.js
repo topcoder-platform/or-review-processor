@@ -7,53 +7,17 @@ global.Promise = require('bluebird')
 
 const _ = require('lodash')
 const config = require('config')
-const should = require('should')
-const helper = require('../../src/common/helper')
-const logger = require('../../src/common/logger')
 const ReviewProcessorService = require('../../src/services/ReviewProcessorService')
 const testHelper = require('../common/testHelper')
 const { testTopics } = require('../common/testData')
 
 describe('Topcoder - Scorecard Review Processor Unit Test', () => {
-  let m2mToken
-
   before(async () => {
-    // generate M2M token
-    m2mToken = await helper.getM2Mtoken()
-
-    // clear reviews if any
-    const submissionId = '5035ded4-db41-4198-9fdf-096671114317'
-    let res = await helper.getRequest(config.REVIEW_API_URL,
-      { submissionId, reviewerId: 151743, scoreCardId: 300001610 },
-      m2mToken)
-    const reviews = res.body || []
-    for (let i = 0; i < reviews.length; i += 1) {
-      await testHelper.deleteRequest(`${config.REVIEW_API_URL}/${reviews[i].id}`, m2mToken)
-    }
-
     testHelper.interceptLogger()
   })
 
   after(async () => {
     testHelper.restoreLogger()
-
-    const submissionId = '5035ded4-db41-4198-9fdf-096671114317'
-    let res = await helper.getRequest(config.REVIEW_API_URL,
-      { submissionId, reviewerId: 151743, scoreCardId: 300001610 },
-      m2mToken)
-    const [review] = res.body
-    await testHelper.deleteRequest(`${config.REVIEW_API_URL}/${review.id}`, m2mToken)
-
-    res = await helper.getRequest(`${config.REVIEW_SUMMATION_API_URL}`, { submissionId }, m2mToken)
-    const [reviewSummation] = res.body
-    if (reviewSummation) {
-      try {
-        await testHelper.deleteRequest(`${config.REVIEW_SUMMATION_API_URL}/${reviewSummation.id}`, m2mToken)
-      } catch (e) {
-        // deleting review summation is optional, so we may ignore error here
-        logger.error(`Ignored error of deleting review summation: ${e.message}`)
-      }
-    }
   })
 
   beforeEach(() => {
@@ -62,28 +26,24 @@ describe('Topcoder - Scorecard Review Processor Unit Test', () => {
 
   it('processor create review success', async () => {
     await ReviewProcessorService.processReview(testTopics.create.testMessage)
-    // wait for the data updated in remote server
-    await testHelper.sleep(config.WAIT_TIME)
-    const submissionId = '5035ded4-db41-4198-9fdf-096671114317'
-    let res = await helper.getRequest(config.REVIEW_API_URL,
-      { submissionId, reviewerId: 151743, scoreCardId: 300001610 },
-      m2mToken)
-    const [review] = res.body
-    should.equal(review.score, 90)
-    should.equal(review.typeId, 'c56a4180-65aa-42ec-a945-5fd21dec0503')
+
+    testHelper.assertDebugMessage('Get submission')
+    testHelper.assertDebugMessage('Submission id: b91a0ca3-3988-4899-bab4-c789f22def39')
+    testHelper.assertDebugMessage('Get review type')
+    testHelper.assertDebugMessage('Review type id: ff5742d6-22bf-4734-b632-add6641078be')
+    testHelper.assertDebugMessage('Create review')
   })
 
   it('processor update review success', async () => {
     await ReviewProcessorService.processReview(testTopics.update.testMessage)
-    // wait for the data updated in remote server
-    await testHelper.sleep(config.WAIT_TIME)
-    const submissionId = '5035ded4-db41-4198-9fdf-096671114317'
-    let res = await helper.getRequest(config.REVIEW_API_URL,
-      { submissionId, reviewerId: 151743, scoreCardId: 300001610 },
-      m2mToken)
-    const [review] = res.body
-    should.equal(review.score, 95)
-    should.equal(review.typeId, 'c56a4180-65aa-42ec-a945-5fd21dec0503')
+
+    testHelper.assertDebugMessage('Get submission')
+    testHelper.assertDebugMessage('Submission id: b91a0ca3-3988-4899-bab4-c789f22def39')
+    testHelper.assertDebugMessage('Get review type')
+    testHelper.assertDebugMessage('Review type id: ff5742d6-22bf-4734-b632-add6641078be')
+    testHelper.assertDebugMessage('Get review')
+    testHelper.assertDebugMessage('Review id: 9c1c080a-b54f-46c4-b87b-6218038be765')
+    testHelper.assertDebugMessage('Update review')
   })
 
   it('test invalid parameters, userId is forbidden for create review message.', async () => {
@@ -115,7 +75,7 @@ describe('Topcoder - Scorecard Review Processor Unit Test', () => {
       await ReviewProcessorService.processReview(message)
       throw new Error('should not throw error here')
     } catch (err) {
-      err.message.should.containEql('Invalid or not supported eventType: INVALID_TYPE')
+      testHelper.assertErrorMessage('Invalid or not supported eventType: INVALID_TYPE')
     }
   })
 

@@ -45,52 +45,20 @@ async function getRequest (url, query, m2mToken) {
 }
 
 /**
- * Uses superagent to proxy post request
- * @param {String} url the url
- * @param {Object} body the JSON object body
- * @param {String} m2mToken the M2M token
- * @returns {Object} the response
- */
-async function postRequest (url, body, m2mToken) {
-  await request
-    .post(url)
-    .send(body)
-    .set('Authorization', `Bearer ${m2mToken}`)
-    .set('Content-Type', 'application/json')
-    .set('Accept', 'application/json')
-}
-
-/**
- * Uses superagent to proxy put request
- * @param {String} url the url
- * @param {Object} body the JSON object body
- * @param {String} m2mToken the M2M token
- * @returns {Object} the response
- */
-async function putRequest (url, body, m2mToken) {
-  await request
-    .put(url)
-    .send(body)
-    .set('Authorization', `Bearer ${m2mToken}`)
-    .set('Content-Type', 'application/json')
-    .set('Accept', 'application/json')
-}
-
-/**
- * Fetch all resources.
- * @param {String} url the url
+ * Fetch all resources using submission api wrapper client
+ * @param {Object} client the submission api wrapper client
+ * @param {String} methodName the wrapper method name
  * @param {Object} query the query object
- * @param {String} m2mToken the M2M token
  * @returns {Object} the response
  */
-async function fetchAll (url, query, m2mToken) {
-  const res = await getRequest(url, query, m2mToken)
+async function fetchAll (client, methodName, query) {
+  const res = await client[methodName](query)
   let result = res.body
   const totalPage = Number(res.header['x-total-pages'])
   if (totalPage > 1) {
     const requests = []
     for (let i = 2; i <= totalPage; i++) {
-      requests.push(getRequest(url, _.assign({ page: i }, query), m2mToken))
+      requests.push(client[methodName](_.assign({ page: i }, query)))
     }
     const extraRes = await Promise.all(requests)
     result = _.reduce(extraRes, (ret, e) => ret.concat(e.body), result)
@@ -102,7 +70,5 @@ module.exports = {
   getKafkaOptions,
   getM2Mtoken,
   getRequest,
-  postRequest,
-  putRequest,
   fetchAll
 }

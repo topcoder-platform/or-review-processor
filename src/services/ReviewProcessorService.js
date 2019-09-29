@@ -7,6 +7,8 @@ const joi = require('joi')
 const config = require('config')
 const logger = require('../common/logger')
 const helper = require('../common/helper')
+const submissionApi = require('@topcoder-platform/topcoder-submission-api-wrapper')
+const submissionApiM2MClient = submissionApi(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME', 'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'SUBMISSION_API_URL', 'AUTH0_PROXY_SERVER_URL']))
 
 /**
  * Process create and update review message
@@ -15,26 +17,27 @@ const helper = require('../common/helper')
 async function processReview (message) {
   const eventType = _.get(message, 'payload.eventType')
   if (eventType === 'CREATE' || eventType === 'UPDATE') {
-    const m2mToken = await helper.getM2Mtoken()
     const { payload } = message
 
     // get submission id via legacy id
-    const res = await helper.getRequest(config.SUBMISSION_API_URL,
-      { legacySubmissionId: payload.submissionId }, m2mToken)
+    logger.debug('Get submission')
+    const res = await submissionApiM2MClient.searchSubmissions({ legacySubmissionId: payload.submissionId })
     const [submission] = res.body
     if (_.isUndefined(submission)) {
       throw new Error(`Incorrect submission id ${payload.submissionId}`)
     }
+    logger.debug(`Submission id: ${submission.id}`)
 
     // get review type UUID
+    logger.debug('Get review type')
     const typeName = config.REVIEW_TYPES[payload.reviewTypeId]
-    const list = await helper.fetchAll(config.REVIEW_TYPE_API_URL,
-      { name: typeName, isActive: true, perPage: 100 }, m2mToken)
+    const list = await helper.fetchAll(submissionApiM2MClient, 'searchReviewTypes', { name: typeName, isActive: true, perPage: 100 })
     const reviewType = _.reduce(list,
       (result, e) => e.name.toLowerCase() === typeName.toLowerCase() ? e : result, undefined)
     if (_.isUndefined(reviewType)) {
       throw new Error(`Incorrect review type id ${payload.reviewTypeId}`)
     }
+    logger.debug(`Review type id: ${reviewType.id}`)
 
     // Use metadata to store legacy review id
     const body = {
@@ -46,16 +49,18 @@ async function processReview (message) {
     }
 
     if (eventType === 'CREATE') {
-      await helper.postRequest(config.REVIEW_API_URL, body, m2mToken)
+      logger.debug('Create review')
+      await submissionApiM2MClient.createReview(body)
     } else {
       // retrieve review
-      let res = await helper.getRequest(config.REVIEW_API_URL,
+      logger.debug('Get review')
+      let res = await submissionApiM2MClient.searchReviews(
         {
           submissionId: submission.id,
           reviewerId: payload.reviewerId,
           scoreCardId: payload.scorecardId
-        },
-        m2mToken)
+        }
+      )
       const reviews = res.body || []
       // find latest review
       let review
@@ -71,8 +76,11 @@ async function processReview (message) {
         throw new Error(`Review doesn't exist under criteria ${_.pick(payload, ['submissionId', 'reviewerId', 'scorecardId'])}`)
       }
 
+      logger.debug(`Review id: ${review.id}`)
+
       // update review
-      await helper.putRequest(`${config.REVIEW_API_URL}/${review.id}`, body, m2mToken)
+      logger.debug('Update review')
+      await submissionApiM2MClient.updateReview(review.id, body)
     }
   } else {
     throw new Error(`Invalid or not supported eventType: ${eventType}`)
