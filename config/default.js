@@ -21,9 +21,8 @@ module.exports = {
   // Kafka topic related to update submission
   UPDATE_SUBMISSION_TOPIC: process.env.UPDATE_SUBMISSION_TOPIC || 'submission.notification.update',
 
-  REVIEW_API_URL: process.env.REVIEW_API_URL || 'https://api.topcoder-dev.com/v5/reviews',
-  SUBMISSION_API_URL: process.env.SUBMISSION_API_URL || 'https://api.topcoder-dev.com/v5/submissions',
-  REVIEW_TYPE_API_URL: process.env.REVIEW_TYPE_API_URL || 'https://api.topcoder-dev.com/v5/reviewTypes',
+  SUBMISSION_API_URL: process.env.SUBMISSION_API_URL || 'https://api.topcoder-dev.com/v5',
+
   CHALLENGE_API_URL: process.env.CHALLENGE_API_URL || 'https://api.topcoder-dev.com/v4/challenges',
   SCORECARD_API_URL: process.env.SCORECARD_API_URL || 'http://localhost:4000/scorecards',
   BUS_API_URL: process.env.BUS_API_URL || 'https://api.topcoder-dev.com/v5/bus/events',
