@@ -37,6 +37,7 @@ Also note that there is a `/health` endpoint that checks for the health of the a
 
 Configuration for the tests is at `config/test.js`, only add such new configurations different from `config/default.js`
 - WAIT_TIME: wait time used in test, default is 2000 or 2 seconds
+- SCORECARD_API_URL: the scorecard api url used in testing
 
 ## Local Kafka setup
 

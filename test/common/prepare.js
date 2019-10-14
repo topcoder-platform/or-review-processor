@@ -35,6 +35,8 @@ prepare(function (done) {
     .reply(200)
     .post('/v5/reviews')
     .reply(200)
+    .get(/\/scorecards\/.+/)
+    .reply(200, { 'id': 'b9956051-4749-4912-abd5-bf4d701af891', 'scorecardDetails': [{ 'id': 'b9956051-4749-4912-abd1-af4d701af891', 'name': 'AV Scan', 'phase': 'submission', 'isActive': true, 'topic': 'avscan.action.scan', 'weight': 25 }, { 'id': 'b9956051-4749-4912-abd1-af4d701af892', 'name': 'OR', 'phase': 'review', 'isActive': true, 'topic': 'or.action.review', 'weight': 25 }, { 'id': 'b9956051-4749-4912-abd1-af4d701af893', 'name': 'AV Scan', 'phase': 'registration', 'isActive': true, 'topic': 'avscan.action.scan', 'weight': 25 }, { 'id': 'b9956051-4749-4912-abd1-af4d701af894', 'name': 'OR', 'phase': 'registration', 'isActive': true, 'topic': 'or.action.review', 'weight': 25 }] })
 
   done()
 }, function (done) {

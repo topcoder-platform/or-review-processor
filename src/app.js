@@ -13,9 +13,12 @@ const SubmissionProcessorService = require('./services/SubmissionProcessorServic
 
 // Start kafka consumer
 logger.info('Starting kafka consumer')
-// create consumer
 
-const consumer = new Kafka.GroupConsumer(helper.getKafkaOptions())
+// create consumer
+let consumer
+if (process.env.NODE_ENV !== 'test') {
+  consumer = new Kafka.GroupConsumer(helper.getKafkaOptions())
+}
 
 /*
  * Data handler linked with Kafka consumer
@@ -52,7 +55,11 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
     .then(() => { logger.debug('Successfully processed message') })
     .catch((err) => { logger.logFullError(err) })
     // commit offset regardless of errors
-    .finally(() => consumer.commitOffset({ topic, partition, offset: m.offset }))
+    .finally(() => {
+      if (consumer) {
+        consumer.commitOffset({ topic, partition, offset: m.offset })
+      }
+    })
 })
 
 // check if there is kafka connection alive
@@ -68,23 +75,25 @@ function check () {
   return connected
 }
 
-const topics = [config.REVIEW_TOPIC, config.CREATE_SUBMISSION_TOPIC, config.UPDATE_SUBMISSION_TOPIC]
+if (consumer) {
+  const topics = [config.REVIEW_TOPIC, config.CREATE_SUBMISSION_TOPIC, config.UPDATE_SUBMISSION_TOPIC]
 
-consumer
-  .init([{
-    subscriptions: topics,
-    handler: dataHandler
-  }])
-  // consume configured topics
-  .then(() => {
-    logger.info('Initialized.......')
-    healthcheck.init([check])
-    logger.info('Adding topics successfully.......')
-    logger.info(topics)
-    logger.info('Kick Start.......')
-  })
-  .catch((err) => logger.error(err))
+  consumer
+    .init([{
+      subscriptions: topics,
+      handler: dataHandler
+    }])
+    // consume configured topics
+    .then(() => {
+      logger.info('Initialized.......')
+      healthcheck.init([check])
+      logger.info('Adding topics successfully.......')
+      logger.info(topics)
+      logger.info('Kick Start.......')
+    })
+    .catch((err) => logger.error(err))
+}
 
 if (process.env.NODE_ENV === 'test') {
-  module.exports = consumer
+  module.exports = dataHandler
 }

@@ -81,25 +81,30 @@ function generateScoreSystemMessage (message, scoreSystem) {
  * @param {Object} message the kafka message to send.
  */
 async function sendMessage (message) {
-  // init producer if needed
-  if (!producer) {
-    producer = new Kafka.Producer(helper.getKafkaOptions())
-    // init kafka producer
-    try {
-      await producer.init()
-    } catch (e) {
-      // if there is any error, reset producer to null so that it will be re-created next time
-      producer = null
-      throw e
+  if (process.env.NODE_ENV === 'test') {
+    logger.debug(`Send Kafka message to topic: ${message.topic}`)
+    logger.debug(`Payload: ${JSON.stringify(message)}`)
+  } else {
+    // init producer if needed
+    if (!producer) {
+      producer = new Kafka.Producer(helper.getKafkaOptions())
+      // init kafka producer
+      try {
+        await producer.init()
+      } catch (e) {
+        // if there is any error, reset producer to null so that it will be re-created next time
+        producer = null
+        throw e
+      }
     }
+    // send message
+    await producer.send({
+      topic: message.topic,
+      message: {
+        value: JSON.stringify(message)
+      }
+    })
   }
-  // send message
-  await producer.send({
-    topic: message.topic,
-    message: {
-      value: JSON.stringify(message)
-    }
-  })
 }
 
 /**
