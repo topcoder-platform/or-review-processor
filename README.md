@@ -85,6 +85,7 @@ npm run lint:fix # To fix possible lint errors
 npm start
 ```
 
+
 ## Testing
 - Run `npm run test` to execute unit tests.
 - RUN `npm run e2e` to execute e2e tests.
@@ -98,4 +99,3 @@ Refer to the verification document `Verification.md`
 - usually, we should use TC bus API (POST /v5/bus/events) to send new messages for SubmissionProcessorService.processSubmission,
   but recently some TC dev API is not available, and the bus API fails with `504 temporarily unavailable error` when
   posting to topic `or.action.review`, so instead, this processor uses a Kafka producer to send new messages
-
