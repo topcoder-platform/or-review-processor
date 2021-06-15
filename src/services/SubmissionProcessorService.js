@@ -118,7 +118,7 @@ async function processSubmission (message) {
 
   // get challenge details
   logger.debug('Get challenge details')
-  const challengeId = message.payload.challengeId
+  const challengeId = message.payload.legacyChallengeId
   const challengeRes = await helper.getRequest(`${config.CHALLENGE_API_URL}/${challengeId}`,
     {}, m2mToken)
   if (!_.get(challengeRes, 'body.result.success')) {
@@ -166,18 +166,9 @@ processSubmission.schema = {
     payload: joi.object().keys({
       resource: joi.string().valid('submission').required(),
       id: joi.string().guid().required(),
-      type: joi.string().valid('Contest Submission').required(),
       url: joi.string().uri().required(),
-      memberId: joi.number().integer().min(1).required(),
-      challengeId: joi.number().integer().min(1).required(),
-      created: joi.date(),
-      updated: joi.date(),
-      createdBy: joi.string(),
-      updatedBy: joi.string(),
-      submissionPhaseId: joi.number().integer().min(1).required(),
-      fileType: joi.string().required(),
-      isFileSubmission: joi.boolean().required()
-    }).required()
+      legacyChallengeId: joi.number().integer().min(1).required()
+    }).unknown(true).required()
   }).required()
 }
 
