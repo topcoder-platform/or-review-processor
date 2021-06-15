@@ -29,7 +29,7 @@
     "lodash": "^4.17.20",
     "no-kafka": "^3.4.3",
     "superagent": "^4.1.0",
-    "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.6",
+    "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.6.7",
     "topcoder-healthcheck-dropin": "^1.0.2",
     "winston": "^3.2.1"
   },
