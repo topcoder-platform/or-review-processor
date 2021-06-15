@@ -92,7 +92,6 @@ npm start
 ## Verification
 Refer to the verification document `Verification.md`
 
-
 ## Notes
 - the retrieved M2M token has no permission to delete review summation,
   but clearing review summation is not necessary, so we may ignore such forbidden error
