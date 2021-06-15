@@ -49,7 +49,7 @@ describe('Topcoder - Scorecard Submission Processor Unit Test', () => {
       testHelper.assertDebugMessage(`"type": "${testMessage.payload.type}"`)
       testHelper.assertDebugMessage(`"url": "${testMessage.payload.url}"`)
       testHelper.assertDebugMessage(`"memberId": ${testMessage.payload.memberId}`)
-      testHelper.assertDebugMessage(`"challengeId": ${testMessage.payload.challengeId}`)
+      testHelper.assertDebugMessage(`"legacyChallengeId": ${testMessage.payload.legacyChallengeId}`)
       testHelper.assertDebugMessage(`"created": "${testMessage.payload.created}"`)
       testHelper.assertDebugMessage(`"updated": "${testMessage.payload.updated}"`)
       testHelper.assertDebugMessage(`"createdBy": "${testMessage.payload.createdBy}"`)
@@ -62,7 +62,7 @@ describe('Topcoder - Scorecard Submission Processor Unit Test', () => {
 
     it('test challenge not found.', async () => {
       const message = _.cloneDeep(testMessage)
-      message.payload.challengeId = 89898989
+      message.payload.legacyChallengeId = 89898989
       try {
         await SubmissionProcessorService.processSubmission(message)
         throw new Error('should not throw error here')
@@ -73,7 +73,7 @@ describe('Topcoder - Scorecard Submission Processor Unit Test', () => {
 
     it('test no matched score system.', async () => {
       const message = _.cloneDeep(testMessage)
-      message.payload.challengeId = 30054674
+      message.payload.legacyChallengeId = 30054674
       await SubmissionProcessorService.processSubmission(message)
 
       testHelper.assertDebugMessage('Scorecard id: 30001610')

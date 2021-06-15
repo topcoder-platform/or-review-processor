@@ -166,6 +166,7 @@ processSubmission.schema = {
     payload: joi.object().keys({
       resource: joi.string().valid('submission').required(),
       id: joi.string().guid().required(),
+      type: joi.string().valid('Contest Submission').required(),
       url: joi.string().uri().required(),
       legacyChallengeId: joi.number().integer().min(1).required()
     }).unknown(true).required()
