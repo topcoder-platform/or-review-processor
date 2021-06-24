@@ -139,8 +139,8 @@ async function processSubmission (message) {
 
   // get scorecard details
   logger.debug('Get scorecard details')
-  const scorecardRes = await helper.getRequest(`${config.SCORECARD_API_URL}/${scorecardId}`, {}, m2mToken)
-  const scorecardDetails = _.get(scorecardRes, 'body.scorecardDetails') || []
+  const scorecardRes = await helper.getRequest(config.SCORECARD_API_URL, { legacyId: scorecardId }, m2mToken)
+  const scorecardDetails = _.get(scorecardRes, 'body[0].scorecardDetails', [])
   if (scorecardDetails.length === 0) {
     throw new Error(`There are no scorecard details for scorecard id: ${scorecardId}`)
   }
