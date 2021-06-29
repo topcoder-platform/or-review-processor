@@ -43,8 +43,8 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
     return
   }
 
-  logger.debug(topic, config.AGGREGATE_SUBMISSION_TOPIC, messageJSON.payload.originalTopic, config.CREATE_SUBMISSION_TOPIC)
-  logger.debug(topic === config.AGGREGATE_SUBMISSION_TOPIC, messageJSON.payload.originalTopic === config.CREATE_SUBMISSION_TOPIC)
+  console.log(topic, config.AGGREGATE_SUBMISSION_TOPIC, messageJSON.payload.originalTopic, config.CREATE_SUBMISSION_TOPIC)
+  console.log(topic === config.AGGREGATE_SUBMISSION_TOPIC, messageJSON.payload.originalTopic === config.CREATE_SUBMISSION_TOPIC)
 
   return (async () => {
     if (topic === config.REVIEW_TOPIC) {
