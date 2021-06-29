@@ -52,6 +52,8 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
     } else if (topic === config.AGGREGATE_SUBMISSION_TOPIC &&
       messageJSON.payload.originalTopic === config.CREATE_SUBMISSION_TOPIC) {
       await SubmissionProcessorService.processSubmission(messageJSON)
+    } else if (topic === config.AGGREGATE_SUBMISSION_TOPIC) {
+      logger.info(`Ignoring topic ${topic} since the original topic is not ${config.CREATE_SUBMISSION_TOPIC}`)
     } else {
       throw new Error(`Invalid topic: ${topic}`)
     }
