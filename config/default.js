@@ -18,8 +18,6 @@ module.exports = {
   REVIEW_TOPIC: process.env.REVIEW_TOPIC || 'submission.notification.score',
   // Kafka topic related to create submission
   CREATE_SUBMISSION_TOPIC: process.env.CREATE_SUBMISSION_TOPIC || 'submission.notification.create',
-  // Kafka topic related to update submission
-  UPDATE_SUBMISSION_TOPIC: process.env.UPDATE_SUBMISSION_TOPIC || 'submission.notification.update',
 
   SUBMISSION_API_URL: process.env.SUBMISSION_API_URL || 'https://api.topcoder-dev.com/v5',
 

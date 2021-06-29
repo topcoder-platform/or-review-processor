@@ -46,7 +46,7 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
   return (async () => {
     if (topic === config.REVIEW_TOPIC) {
       await ReviewProcessorService.processReview(messageJSON)
-    } else if (topic === config.CREATE_SUBMISSION_TOPIC || topic === config.UPDATE_SUBMISSION_TOPIC) {
+    } else if (topic === config.CREATE_SUBMISSION_TOPIC) {
       await SubmissionProcessorService.processSubmission(messageJSON)
     } else {
       throw new Error(`Invalid topic: ${topic}`)
@@ -76,7 +76,7 @@ function check () {
 }
 
 if (consumer) {
-  const topics = [config.REVIEW_TOPIC, config.CREATE_SUBMISSION_TOPIC, config.UPDATE_SUBMISSION_TOPIC]
+  const topics = [config.REVIEW_TOPIC, config.CREATE_SUBMISSION_TOPIC]
 
   consumer
     .init([{

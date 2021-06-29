@@ -97,56 +97,6 @@ debug: Successfully processed message
 {"topic":"or.action.review","originator":"tc-scorecard-processor","timestamp":"2019-04-07T21:36:04.215Z","mime-type":"application/json","payload":{"resource":"submission","id":"104366f8-f46b-45db-a971-11bc69e6c8ff","type":"Contest Submission","url":"https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip","memberId":8547899,"challengeId":30049360,"created":"2019-04-02T06:59:29.785Z","updated":"2019-04-02T06:59:29.785Z","createdBy":"TonyJ","updatedBy":"TonyJ","submissionPhaseId":764644,"fileType":"zip","isFileSubmission":false,"eventType":"CREATE"}}
 ```
 
-- start kafka-console-producer to write messages to `submission.notification.update` topic:
-  `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic submission.notification.update`
-- write message:
-  `{ "topic": "submission.notification.update", "originator": "or-app", "timestamp": "2019-02-25T00:00:00", "mime-type": "application/json", "payload": { "resource": "submission", "id": "104366f8-f46b-45db-a971-11bc69e6c8ff", "type": "Contest Submission", "url": "https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip", "memberId": 8547899, "challengeId": 30049360, "created": "2019-04-02T06:59:29.785Z", "updated": "2019-04-02T06:59:29.785Z", "createdBy": "TonyJ", "updatedBy": "TonyJ", "submissionPhaseId": 764644, "fileType": "zip", "isFileSubmission": false } }`
-- watch the app console, it should show logging of processing the message:
-```
-debug: Get M2M token
-debug: Get challenge details
-debug: Scorecard id: 30001610
-debug: Current phase: Registration
-debug: Get scorecard details
-debug: Post Kafka message for score system AV Scan: {
-    "topic": "avscan.action.scan",
-    "originator": "tc-scorecard-processor",
-    "timestamp": "2019-04-07T21:41:52.713Z",
-    "mime-type": "application/json",
-    "payload": {
-        "status": "unscanned",
-        "submissionId": "104366f8-f46b-45db-a971-11bc69e6c8ff",
-        "url": "https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip",
-        "fileName": "30054740-8547899-SUBMISSION_ZIP-1554188341581.zip"
-    }
-}
-debug: Post Kafka message for score system OR: {
-    "topic": "or.action.review",
-    "originator": "tc-scorecard-processor",
-    "timestamp": "2019-04-07T21:41:52.729Z",
-    "mime-type": "application/json",
-    "payload": {
-        "resource": "submission",
-        "id": "104366f8-f46b-45db-a971-11bc69e6c8ff",
-        "type": "Contest Submission",
-        "url": "https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip",
-        "memberId": 8547899,
-        "challengeId": 30049360,
-        "created": "2019-04-02T06:59:29.785Z",
-        "updated": "2019-04-02T06:59:29.785Z",
-        "createdBy": "TonyJ",
-        "updatedBy": "TonyJ",
-        "submissionPhaseId": 764644,
-        "fileType": "zip",
-        "isFileSubmission": false,
-        "eventType": "UPDATE"
-    }
-}
-debug: EXIT processSubmission
-debug: output arguments
-debug: Successfully processed message
-```
-
 - the kafka-console-consumer listening to topic `avscan.action.scan` should show:
 ```
 {"topic":"avscan.action.scan","originator":"tc-scorecard-processor","timestamp":"2019-04-07T21:41:52.713Z","mime-type":"application/json","payload":{"status":"unscanned","submissionId":"104366f8-f46b-45db-a971-11bc69e6c8ff","url":"https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip","fileName":"30054740-8547899-SUBMISSION_ZIP-1554188341581.zip"}}
@@ -156,19 +106,6 @@ debug: Successfully processed message
 ```
 {"topic":"or.action.review","originator":"tc-scorecard-processor","timestamp":"2019-04-07T21:41:52.729Z","mime-type":"application/json","payload":{"resource":"submission","id":"104366f8-f46b-45db-a971-11bc69e6c8ff","type":"Contest Submission","url":"https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip","memberId":8547899,"challengeId":30049360,"created":"2019-04-02T06:59:29.785Z","updated":"2019-04-02T06:59:29.785Z","createdBy":"TonyJ","updatedBy":"TonyJ","submissionPhaseId":764644,"fileType":"zip","isFileSubmission":false,"eventType":"UPDATE"}}
 ```
-
-- you may write invalid messages like below:
-  `{ "topic": "submission.notification.update", "originator": "or-app", "timestamp": "invalid", "mime-type": "application/json", "payload": { "resource": "submission", "id": "104366f8-f46b-45db-a971-11bc69e6c8ff", "type": "Contest Submission", "url": "https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip", "memberId": 8547899, "challengeId": 30049360, "created": "2019-04-02T06:59:29.785Z", "updated": "2019-04-02T06:59:29.785Z", "createdBy": "TonyJ", "updatedBy": "TonyJ", "submissionPhaseId": 764644, "fileType": "zip", "isFileSubmission": false } }`
-
-  `{ "topic": "submission.notification.update", "originator": "or-app", "timestamp": "2019-02-25T00:00:00", "mime-type": "application/json", "payload": { "resource": "other", "id": "104366f8-f46b-45db-a971-11bc69e6c8ff", "type": "Contest Submission", "url": "https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip", "memberId": 8547899, "challengeId": 30049360, "created": "2019-04-02T06:59:29.785Z", "updated": "2019-04-02T06:59:29.785Z", "createdBy": "TonyJ", "updatedBy": "TonyJ", "submissionPhaseId": 764644, "fileType": "zip", "isFileSubmission": false } }`
-
-  `{ "topic": "submission.notification.update", "originator": "or-app", "timestamp": "2019-02-25T00:00:00", "mime-type": "application/json", "payload": { "resource": "submission", "memberId": 8547899, "challengeId": 30049360, "created": "2019-04-02T06:59:29.785Z", "updated": "2019-04-02T06:59:29.785Z", "createdBy": "TonyJ", "updatedBy": "TonyJ", "submissionPhaseId": 764644, "fileType": "zip", "isFileSubmission": false } }`
-
-  `[ { , abc`
-
-- the app console will show proper error messages
-
-
 
 ## Unit test Coverage
 

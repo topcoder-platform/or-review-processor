@@ -203,7 +203,7 @@ async function consumeMessages () {
   // consume and commit all not processed messages
   const consumer = new Kafka.GroupConsumer(helper.getKafkaOptions())
   await consumer.init([{
-    subscriptions: [config.REVIEW_TOPIC, config.CREATE_SUBMISSION_TOPIC, config.UPDATE_SUBMISSION_TOPIC,
+    subscriptions: [config.REVIEW_TOPIC, config.CREATE_SUBMISSION_TOPIC,
       testData.avScanTopic, testData.reviewActionTopic],
     handler: (messageSet, topic, partition) => Promise.each(messageSet,
       (m) => consumer.commitOffset({ topic, partition, offset: m.offset }))
