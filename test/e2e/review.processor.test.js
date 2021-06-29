@@ -83,7 +83,7 @@ describe('Topcoder - Scorecard Review Processor E2E Test', () => {
     testHelper.assertErrorMessage('Invalid or not supported eventType: INVALID_TYPE')
   })
 
-  for (const op of ['create', 'update']) {
+  for (const op of ['create']) {
     let { requiredFields, integerFields, stringFields, testMessage } = testTopics[op]
 
     it('test invalid parameters, field submissionId incorrect', async () => {

@@ -54,7 +54,7 @@ const testTopics = {
       }
     }
   },
-  'submission.notification.create': {
+  'submission.notification.aggregate': {
     operation: 'create',
     requiredFields: ['topic', 'originator', 'timestamp', 'mime-type',
       'payload.resource', 'payload.id', 'payload.url',
@@ -65,11 +65,12 @@ const testTopics = {
     dateFields: ['timestamp'],
     booleanFields: [],
     testMessage: {
-      topic: 'submission.notification.create',
+      topic: 'submission.notification.aggregate',
       originator: 'or-app',
       timestamp: '2019-02-25T00:00:00',
       'mime-type': 'application/json',
       payload: {
+        originalTopic: 'submission.notification.create',
         resource: 'submission',
         id: '104366f8-f46b-45db-a971-11bc69e6c8ff',
         type: 'Contest Submission',

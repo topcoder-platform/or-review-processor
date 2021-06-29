@@ -37,10 +37,10 @@ curl --request POST --url https://topcoder-dev.auth0.com/oauth/token --header 'c
   `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic avscan.action.scan --from-beginning`
 - start kafka-console-consumer to listen to topic `or.action.review`:
   `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic or.action.review --from-beginning`
-- start kafka-console-producer to write messages to `submission.notification.create` topic:
-  `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic submission.notification.create`
+- start kafka-console-producer to write messages to `submission.notification.aggregate` topic:
+  `bin/kafka-console-producer.sh --broker-list localhost:9092 --topic submission.notification.aggregate`
 - write message:
-  `{ "topic": "submission.notification.create", "originator": "or-app", "timestamp": "2019-02-25T00:00:00", "mime-type": "application/json", "payload": { "resource": "submission", "id": "104366f8-f46b-45db-a971-11bc69e6c8ff", "type": "Contest Submission", "url": "https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip", "memberId": 8547899, "challengeId": 30049360, "created": "2019-04-02T06:59:29.785Z", "updated": "2019-04-02T06:59:29.785Z", "createdBy": "TonyJ", "updatedBy": "TonyJ", "submissionPhaseId": 764644, "fileType": "zip", "isFileSubmission": false } }`
+  `{ "topic": "submission.notification.aggregate", "originator": "or-app", "timestamp": "2019-02-25T00:00:00", "mime-type": "application/json", "payload": { "originalTopic": "submission.notification.create", "resource": "submission", "id": "104366f8-f46b-45db-a971-11bc69e6c8ff", "type": "Contest Submission", "url": "https://s3.amazonaws.com/topcoder-dev-submissions-dmz/30054740-8547899-SUBMISSION_ZIP-1554188341581.zip", "memberId": 8547899, "challengeId": 30049360, "created": "2019-04-02T06:59:29.785Z", "updated": "2019-04-02T06:59:29.785Z", "createdBy": "TonyJ", "updatedBy": "TonyJ", "submissionPhaseId": 764644, "fileType": "zip", "isFileSubmission": false } }`
 - watch the app console, it should show logging of processing the message:
 ```
 debug: Get M2M token

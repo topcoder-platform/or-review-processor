@@ -62,7 +62,8 @@ function generateScoreSystemMessage (message, scoreSystem) {
   }
   if (scoreSystem.topic === 'or.action.review') {
     const payload = message.payload
-    payload.eventType = message.topic === config.CREATE_SUBMISSION_TOPIC ? 'CREATE' : 'UPDATE'
+    payload.eventType = 'CREATE'
+    delete payload.originalTopic
     return {
       topic: scoreSystem.topic,
       originator: 'tc-scorecard-processor',
@@ -164,6 +165,7 @@ processSubmission.schema = {
     timestamp: joi.date().required(),
     'mime-type': joi.string().required(),
     payload: joi.object().keys({
+      originalTopic: joi.string().valid(config.CREATE_SUBMISSION_TOPIC).required(),
       resource: joi.string().valid('submission').required(),
       id: joi.string().guid().required(),
       type: joi.string().valid('Contest Submission').required(),

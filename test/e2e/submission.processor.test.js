@@ -26,7 +26,7 @@ describe('Topcoder - Scorecard Submission Processor E2E Test', () => {
     testHelper.clearInterceptedLogging()
   })
 
-  for (const topic of [config.CREATE_SUBMISSION_TOPIC]) {
+  for (const topic of [config.AGGREGATE_SUBMISSION_TOPIC]) {
     const { operation, requiredFields, integerFields, stringFields, dateFields,
       booleanFields, testMessage } = testTopics[topic]
 

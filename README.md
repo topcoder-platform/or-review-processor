@@ -20,7 +20,7 @@ The following parameters can be set in config files or in env variables:
     if provided, it can be either path to private key file or private key content
 - KAFKA_GROUP_ID: consumer group id; default value: 'scorecard-processor'
 - REVIEW_TOPIC : Review topic, default value is 'submission.notification.score'
-- CREATE_SUBMISSION_TOPIC : create submission topic, default value is 'submission.notification.create'
+- AGGREGATE_SUBMISSION_TOPIC : aggregate submission topic, default value is 'submission.notification.aggregate'
 - SUBMISSION_API_URL: submission api url, default is 'https://api.topcoder-dev.com/v5'
 - CHALLENGE_API_URL: challenge API URL, default is 'https://api.topcoder-dev.com/v4/challenges'
 - SCORECARD_API_URL: scorecard API URL, default is 'http://localhost:4000/scorecards'
@@ -53,7 +53,7 @@ Configuration for the tests is at `config/test.js`, only add such new configurat
 - note that the zookeeper server is at localhost:2181, and Kafka server is at localhost:9092
 - use another terminal, go to same directory, create the needed topics:
   `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic submission.notification.score`
-  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic submission.notification.create`
+  `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic submission.notification.aggregate`
   `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic avscan.action.scan`
   `bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic or.action.review`
 - verify that the topics are created:
