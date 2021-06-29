@@ -8,13 +8,17 @@ const Kafka = require('no-kafka')
 const healthcheck = require('topcoder-healthcheck-dropin')
 const logger = require('./common/logger')
 const helper = require('./common/helper')
-const ProcessorService = require('./services/ProcessorService')
+const ReviewProcessorService = require('./services/ReviewProcessorService')
+const SubmissionProcessorService = require('./services/SubmissionProcessorService')
 
 // Start kafka consumer
 logger.info('Starting kafka consumer')
-// create consumer
 
-const consumer = new Kafka.GroupConsumer(helper.getKafkaOptions())
+// create consumer
+let consumer
+if (process.env.NODE_ENV !== 'test') {
+  consumer = new Kafka.GroupConsumer(helper.getKafkaOptions())
+}
 
 /*
  * Data handler linked with Kafka consumer
@@ -39,18 +43,29 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
     return
   }
 
+  console.log(topic, config.AGGREGATE_SUBMISSION_TOPIC, messageJSON.payload.originalTopic, config.CREATE_SUBMISSION_TOPIC)
+  console.log(topic === config.AGGREGATE_SUBMISSION_TOPIC, messageJSON.payload.originalTopic === config.CREATE_SUBMISSION_TOPIC)
+
   return (async () => {
-    if (topic === config.OR_REVIEW_TOPIC) {
-      await ProcessorService.process(messageJSON)
+    if (topic === config.REVIEW_TOPIC) {
+      await ReviewProcessorService.processReview(messageJSON)
+    } else if (topic === config.AGGREGATE_SUBMISSION_TOPIC &&
+      messageJSON.payload.originalTopic === config.CREATE_SUBMISSION_TOPIC) {
+      await SubmissionProcessorService.processSubmission(messageJSON)
+    } else if (topic === config.AGGREGATE_SUBMISSION_TOPIC) {
+      logger.info(`Ignoring topic ${topic} since the original topic is not ${config.CREATE_SUBMISSION_TOPIC}`)
     } else {
       throw new Error(`Invalid topic: ${topic}`)
     }
-    logger.debug('Successfully processed message')
   })()
-  // commit offset regardless of errors
-    .then(() => {})
+    .then(() => { logger.debug('Successfully processed message') })
     .catch((err) => { logger.logFullError(err) })
-    .finally(() => consumer.commitOffset({ topic, partition, offset: m.offset }))
+    // commit offset regardless of errors
+    .finally(() => {
+      if (consumer) {
+        consumer.commitOffset({ topic, partition, offset: m.offset })
+      }
+    })
 })
 
 // check if there is kafka connection alive
@@ -66,23 +81,25 @@ function check () {
   return connected
 }
 
-const topics = [config.OR_REVIEW_TOPIC]
+if (consumer) {
+  const topics = [config.REVIEW_TOPIC, config.AGGREGATE_SUBMISSION_TOPIC]
 
-consumer
-  .init([{
-    subscriptions: topics,
-    handler: dataHandler
-  }])
-  // consume configured topics
-  .then(() => {
-    logger.info('Initialized.......')
-    healthcheck.init([check])
-    logger.info('Adding topics successfully.......')
-    logger.info(topics)
-    logger.info('Kick Start.......')
-  })
-  .catch((err) => logger.error(err))
+  consumer
+    .init([{
+      subscriptions: topics,
+      handler: dataHandler
+    }])
+    // consume configured topics
+    .then(() => {
+      logger.info('Initialized.......')
+      healthcheck.init([check])
+      logger.info('Adding topics successfully.......')
+      logger.info(topics)
+      logger.info('Kick Start.......')
+    })
+    .catch((err) => logger.error(err))
+}
 
 if (process.env.NODE_ENV === 'test') {
-  module.exports = consumer
+  module.exports = dataHandler
 }

@@ -7,26 +7,29 @@
     "start": "node src/app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test": "nyc --reporter=html --reporter=text mocha test/unit/test.js --timeout 20000 --exit",
-    "e2e": "nyc --reporter=html --reporter=text mocha test/e2e/test.js --timeout 20000 --exit"
+    "test": "nyc --reporter=html --reporter=text mocha test/unit/*.test.js --require test/common/prepare.js --timeout 20000 --exit",
+    "e2e": "nyc --reporter=html --reporter=text mocha test/e2e/*.test.js --require test/common/prepare.js --timeout 20000 --exit"
   },
   "author": "TCSCODER",
   "license": "none",
   "devDependencies": {
     "mocha": "^5.2.0",
+    "mocha-prepare": "^0.1.0",
+    "nock": "^11.3.5",
     "nyc": "^13.3.0",
     "should": "^13.2.3",
-    "standard": "^11.0.1"
+    "standard": "^12.0.1"
   },
   "dependencies": {
+    "@topcoder-platform/topcoder-submission-api-wrapper": "^1.1.0",
     "bluebird": "^3.5.3",
     "config": "^3.0.1",
     "get-parameter-names": "^0.3.0",
     "joi": "^14.3.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.20",
     "no-kafka": "^3.4.3",
     "superagent": "^4.1.0",
-    "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.6",
+    "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.6.7",
     "topcoder-healthcheck-dropin": "^1.0.2",
     "winston": "^3.2.1"
   },
@@ -41,8 +44,8 @@
   "nyc": {
     "exclude": [
       "test/common/*.js",
-      "test/unit/test.js",
-      "test/e2e/test.js"
+      "test/unit/*.js",
+      "test/e2e/*.js"
     ]
   }
 }
